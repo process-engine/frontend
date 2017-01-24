@@ -1,0 +1,34 @@
+'use strict';
+
+import {
+{{#routes}}    {{routeComponentName}},
+{{/routes}}
+    {{appComponentName}}
+} from '{{{containerPath}}}';
+
+const relayQueries = require('{{{relayQueriesPath}}}');
+const relayPrepareParams = require('{{{relayPrepareParamsPath}}}');
+
+const routeSetup = {
+    routeConfig: {
+{{#routes}}        {{routeKeyName}}: {
+            key: {{routeIndex}},
+            name: '{{routeName}}',
+            breadcrumbIgnore: {{breadcrumbIgnore}},
+            breadcrumbName: '{{breadcrumbName}}',{{#isIndexRoute}}
+            isIndexRoute: true,{{/isIndexRoute}}{{^isIndexRoute}}
+            path: '{{{routePath}}}',{{/isIndexRoute}}
+            component: {{routeComponentName}},
+            {{#routePrepareParamFuncName}}prepareParams: (relayPrepareParams && relayPrepareParams.{{routePrepareParamFuncName}} ? relayPrepareParams.{{routePrepareParamFuncName}} : null),{{/routePrepareParamFuncName}}{{^routePrepareParamFuncName}}prepareParams: null,{{/routePrepareParamFuncName}}
+            queries: (relayQueries && relayQueries.{{routeComponentName}}Queries ? relayQueries.{{routeComponentName}}Queries : null)
+        }{{^isLast}},{{/isLast}}
+{{/routes}}
+    },
+    routePath: '{{{mainRoutePath}}}',
+    appName: '{{appName}}',
+    name: '{{name}}',
+    AppComponent: {{appComponentName}},
+    appQueries: (relayQueries && relayQueries.{{appComponentName}}Queries ? relayQueries.{{appComponentName}}Queries : null)
+};
+
+export default routeSetup;

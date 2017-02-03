@@ -122,7 +122,7 @@ class FrontendService {
     if (this.config.relayQueriesHelperPath) {
       this.config.relayQueries = require(path.resolve(this.config.relayQueriesHelperPath));
       this.config.relayPrepareParams = require(path.resolve(this.config.relayPrepareParamsPath));
-      this.config.appQueries = (this.config.relayQueries && this.config.relayQueries.AppQueries ? this.config.relayQueries.AppQueries : null);
+      this.config.appQueries = (this.config.relayQueries && this.config.relayQueries[this.config.AppComponentQueriesName] ? this.config.relayQueries[this.config.AppComponentQueriesName] : null);
       this.config.appPrepareParams = (this.config.AppPreparedParamsFuncName && this.config.relayPrepareParams && this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] ? this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] : null);
     }
 
@@ -143,6 +143,7 @@ class FrontendService {
         relayPrepareParamsPath: path.resolve(this.config.relayPrepareParamsPath),
         mainRoutePath: this.config.routePath,
         appComponentName: this.config.AppComponentName,
+        appComponentQueriesName: this.config.AppComponentQueriesName,
         appName: this.config.appName,
         name: this.config.name,
         routes: Object.keys(this.config.routeConfig).map((key, idx) => {
@@ -156,6 +157,7 @@ class FrontendService {
             isIndexRoute: this.config.routeConfig[key].isIndexRoute,
             routePrepareParamFuncName: this.config.routeConfig[key].prepareParamFuncName,
             routeComponentName: this.config.routeConfig[key].componentName,
+            routeComponentQueriesName: this.config.routeConfig[key].componentQueriesName,
             isLast: (idx >= Object.keys(this.config.routeConfig).length - 1)
           }
         })

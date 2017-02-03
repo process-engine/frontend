@@ -15,7 +15,8 @@ module.exports = function(grunt) {
           }
         ]
       }
-    }, babel: {
+    },
+    babel: {
       options: {
         babelrc: true
       },

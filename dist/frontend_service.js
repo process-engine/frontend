@@ -29,36 +29,27 @@ global.__SERVER__ = true;
 global.__DISABLE_SSR__ = false;
 global.__DEVTOOLS__ = global.__DEVELOPMENT__ = process.env.NODE_ENV !== 'production';
 
+require('es6-promise').polyfill();
+
 var fs = require('fs');
 var path = require('path');
-var appRoot = path.normalize(process.cwd());
 var express = require('express');
-
 var React = require('react');
 var ReactDOM = require('react-dom/server');
-
 var HtmlHelper = require('./helpers/Html');
 var PrettyError = require('pretty-error');
 var match = require('react-router').match;
-
-require('es6-promise').polyfill();
-
-
 var ReduxAsyncConnect = require('redux-async-connect').ReduxAsyncConnect;
 var loadOnServer = require('redux-async-connect').loadOnServer;
 var createHistory = require('react-router/lib/createMemoryHistory');
 var Provider = require('react-redux').Provider;
 var routesProvider = require('./routes/routes');
 var createStore = require('./redux/create');
-
 var pretty = new PrettyError();
-
 var WebpackIsomorphicTools = require('webpack-isomorphic-tools');
 var WebpackIsomorphicToolsConf = require('./helpers/devtools/webpack/webpack-isomorphic-tools');
-
 var Webpack = require('webpack');
 var mustache = require('mustache');
-
 var nconf = require('nconf');
 
 function _getFrontend(frontendConfig, reduxApiImpl, webpackIsomorphicTools) {
@@ -152,7 +143,7 @@ var FrontendService = function () {
       if (this.config.relayQueriesHelperPath) {
         this.config.relayQueries = require(path.resolve(this.config.relayQueriesHelperPath));
         this.config.relayPrepareParams = require(path.resolve(this.config.relayPrepareParamsPath));
-        this.config.appQueries = this.config.relayQueries && this.config.relayQueries.AppQueries ? this.config.relayQueries.AppQueries : null;
+        this.config.appQueries = this.config.relayQueries && this.config.relayQueries[this.config.AppComponentQueriesName] ? this.config.relayQueries[this.config.AppComponentQueriesName] : null;
         this.config.appPrepareParams = this.config.AppPreparedParamsFuncName && this.config.relayPrepareParams && this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] ? this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] : null;
       }
 
@@ -171,6 +162,7 @@ var FrontendService = function () {
           relayPrepareParamsPath: path.resolve(_this.config.relayPrepareParamsPath),
           mainRoutePath: _this.config.routePath,
           appComponentName: _this.config.AppComponentName,
+          appComponentQueriesName: _this.config.AppComponentQueriesName,
           appName: _this.config.appName,
           name: _this.config.name,
           routes: Object.keys(_this.config.routeConfig).map(function (key, idx) {
@@ -184,24 +176,26 @@ var FrontendService = function () {
               isIndexRoute: _this.config.routeConfig[key].isIndexRoute,
               routePrepareParamFuncName: _this.config.routeConfig[key].prepareParamFuncName,
               routeComponentName: _this.config.routeConfig[key].componentName,
+              routeComponentQueriesName: _this.config.routeConfig[key].componentQueriesName,
               isLast: idx >= Object.keys(_this.config.routeConfig).length - 1
             };
           })
         };
 
+        //Routes are generated into the src and will be build into dist
         // frontend
-        fs.mkdir(path.resolve(_this.config.frontendPath), function (mkDirFrontendErr) {
+        fs.mkdir(path.resolve(_this.config.frontendSrcPath), function (mkDirFrontendErr) {
           if (mkDirFrontendErr && mkDirFrontendErr.code != 'EEXIST') throw mkDirFrontendErr;
 
           // helpers
-          fs.mkdir(path.resolve(_this.config.frontendPath, _this.config.helpersTargetPathName), function (mkDirHelperErr) {
+          fs.mkdir(path.resolve(_this.config.frontendSrcPath, _this.config.helpersTargetPathName), function (mkDirHelperErr) {
             if (mkDirHelperErr && mkDirHelperErr.code != 'EEXIST') throw mkDirHelperErr;
 
             // routes
-            fs.mkdir(path.resolve(_this.config.frontendPath, _this.config.helpersTargetPathName, _this.config.routeHelperPathName), function (mkDirRoutesErr) {
+            fs.mkdir(path.resolve(_this.config.frontendSrcPath, _this.config.helpersTargetPathName, _this.config.routeHelperPathName), function (mkDirRoutesErr) {
               if (mkDirRoutesErr && mkDirRoutesErr.code != 'EEXIST') throw mkDirRoutesErr;
 
-              fs.writeFile(path.resolve(_this.config.frontendPath, _this.config.helpersTargetPathName, _this.config.routeHelperPathName, _this.config.routeHelperFileName + '.js'), mustache.render(routeConfigHelperTemplateData.toString(), routeConfigObject), function (err) {
+              fs.writeFile(path.resolve(_this.config.frontendSrcPath, _this.config.helpersTargetPathName, _this.config.routeHelperPathName, _this.config.routeHelperFileName + '.js'), mustache.render(routeConfigHelperTemplateData.toString(), routeConfigObject), function (err) {
                 if (err) throw err;
 
                 console.log('RouteConfigHelper JS generated!');

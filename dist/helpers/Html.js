@@ -88,6 +88,7 @@ var Html = (_temp = _class = function (_Component) {
                     head.meta.toComponent(),
                     head.link.toComponent(),
                     head.script.toComponent(),
+                    _react2.default.createElement('link', { rel: 'stylesheet', href: '/vendor/bpmn-font/css/bpmn-embedded.css' }),
                     _react2.default.createElement('link', { rel: 'shortcut icon', href: '/favicon.ico' }),
                     _react2.default.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
                     Object.keys(assets.styles).map(function (style, key) {

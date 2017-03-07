@@ -49,6 +49,7 @@ class Html extends Component {
             {head.link.toComponent()}
             {head.script.toComponent()}
 
+            <link rel="stylesheet" href="/vendor/bpmn-font/css/bpmn-embedded.css" />
             <link rel="shortcut icon" href="/favicon.ico"/>
 
             <meta name="viewport" content="width=device-width, initial-scale=1"/>

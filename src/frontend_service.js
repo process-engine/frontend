@@ -198,7 +198,10 @@ class FrontendService {
           lazy: false,
           publicPath: this.config.webpackConfig.output.publicPath,
           headers: { "Access-Control-Allow-Origin": '*' },
-          stats: { colors: true }
+          stats: { colors: true },
+          watchOptions: {
+            poll: 2000
+          }
         };
 
         const app = new express();

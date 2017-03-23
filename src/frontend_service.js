@@ -41,16 +41,16 @@ function getFrontend(frontendConfig, reduxApiImpl, webpackIsomorphicTools) {
     const history = createHistory(req.originalUrl);
     let reducer = null;
     if (frontendConfig.reduxReducerPath) {
-      reducer = require(path.resolve(frontendConfig.reduxReducerPath, frontendConfig.reduxReducerFileName));
+      reducer = require(path.resolve(frontendConfig.buildReduxReducerPath, frontendConfig.reduxReducerFileName));
     }
 
     const store = createStore(frontendConfig, reducer(reduxApiImpl.reducers), history);
 
     function hydrateOnClient() {
       res.send('<!doctype html>\n' + ReactDOM.renderToString(
-        <HtmlHelper config={frontendConfig}
-                    assets={webpackIsomorphicTools.assets()}
-                    store={store}/>
+          <HtmlHelper config={frontendConfig}
+                      assets={webpackIsomorphicTools.assets()}
+                      store={store}/>
         )
       );
     }
@@ -83,9 +83,9 @@ function getFrontend(frontendConfig, reduxApiImpl, webpackIsomorphicTools) {
           global.navigator = { userAgent: req.headers['user-agent'] };
 
           res.send('<!doctype html>\n' + ReactDOM.renderToString(
-            <HtmlHelper config={frontendConfig}
-                        assets={webpackIsomorphicTools.assets()}
-                        component={component} store={store}/>
+              <HtmlHelper config={frontendConfig}
+                          assets={webpackIsomorphicTools.assets()}
+                          component={component} store={store}/>
             )
           );
         });
@@ -99,34 +99,35 @@ function getFrontend(frontendConfig, reduxApiImpl, webpackIsomorphicTools) {
 class FrontendService {
   config = null;
 
-  constructor() {}
+  constructor() {
+  }
 
   initialize() {
     this.routeConfig = this.config.routeConfig;
 
     if (this.config.routedComponentsPath) {
       if (this.config.AppComponentName) {
-        this.config.AppComponent = require(path.resolve(this.config.routedComponentsPath, this.config.AppComponentName, this.config.AppComponentName));
+        this.config.AppComponent = require(path.resolve(this.config.buildRoutedComponentsPath, this.config.AppComponentName, this.config.AppComponentName));
       }
       if (this.config.NotFoundComponentName) {
-        this.config.NotFoundComponent = require(path.resolve(this.config.routedComponentsPath, this.config.NotFoundComponentName, this.config.NotFoundComponentName));
+        this.config.NotFoundComponent = require(path.resolve(this.config.buildRoutedComponentsPath, this.config.NotFoundComponentName, this.config.NotFoundComponentName));
       }
     }
 
     Object.keys(this.routeConfig).forEach((route) => {
       if (this.routeConfig[route].componentName) {
-        this.routeConfig[route].component = require(path.resolve(this.config.routedComponentsPath, this.routeConfig[route].componentName, this.routeConfig[route].componentName));
+        this.routeConfig[route].component = require(path.resolve(this.config.buildRoutedComponentsPath, this.routeConfig[route].componentName, this.routeConfig[route].componentName));
       }
     });
 
     if (this.config.relayQueriesHelperPath) {
-      this.config.relayQueries = require(path.resolve(this.config.relayQueriesHelperPath));
-      this.config.relayPrepareParams = require(path.resolve(this.config.relayPrepareParamsPath));
+      this.config.relayQueries = require(path.resolve(this.config.buildRelayQueriesHelperPath));
+      this.config.relayPrepareParams = require(path.resolve(this.config.buildRelayPrepareParamsPath));
       this.config.appQueries = (this.config.relayQueries && this.config.relayQueries[this.config.AppComponentQueriesName] ? this.config.relayQueries[this.config.AppComponentQueriesName] : null);
       this.config.appPrepareParams = (this.config.AppPreparedParamsFuncName && this.config.relayPrepareParams && this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] ? this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] : null);
     }
 
-    this.reduxApiConfig = require(path.resolve(this.config.restReducerPath, this.config.restReducerFileName));
+    this.reduxApiConfig = require(path.resolve(this.config.buildRestReducerPath, this.config.restReducerFileName));
     this.reduxApiImpl = reduxApi(this.reduxApiConfig);
     this.reduxApiImpl
       .use("fetch", adapterFetch(fetch))
@@ -176,7 +177,7 @@ class FrontendService {
           fs.mkdir(path.resolve(this.config.frontendSrcPath, this.config.helpersTargetPathName, this.config.routeHelperPathName), (mkDirRoutesErr) => {
             if (mkDirRoutesErr && mkDirRoutesErr.code != 'EEXIST') throw mkDirRoutesErr;
 
-              fs.writeFile(path.resolve(this.config.frontendSrcPath, this.config.helpersTargetPathName, this.config.routeHelperPathName, this.config.routeHelperFileName + '.js'), mustache.render(routeConfigHelperTemplateData.toString(), routeConfigObject), (err) => {
+            fs.writeFile(path.resolve(this.config.frontendSrcPath, this.config.helpersTargetPathName, this.config.routeHelperPathName, this.config.routeHelperFileName + '.js'), mustache.render(routeConfigHelperTemplateData.toString(), routeConfigObject), (err) => {
               if (err) throw err;
 
               console.log('RouteConfigHelper JS generated!');
@@ -198,10 +199,12 @@ class FrontendService {
           lazy: false,
           publicPath: this.config.webpackConfig.output.publicPath,
           headers: { "Access-Control-Allow-Origin": '*' },
-          stats: { colors: true },
+          stats: "minimal",
           watchOptions: {
-            poll: 2000
-          }
+            ignored: /node_modules/,
+            aggregateTimeout: 500,
+            poll: 2000,
+          },
         };
 
         const app = new express();

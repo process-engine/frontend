@@ -7,8 +7,8 @@ var getBabelRelayPlugin = require('babel-relay-plugin');
 
 var schema = null;
 if (fs.existsSync(appRoot + '/graphql-schema.json')) {
-    var schemaData = require(appRoot + '/graphql-schema.json').data;
-    schema = getBabelRelayPlugin(schemaData);
+  var schemaData = require(appRoot + '/graphql-schema.json').data;
+  schema = getBabelRelayPlugin(schemaData);
 }
 
 module.exports = schema;

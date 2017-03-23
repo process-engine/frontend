@@ -63,7 +63,7 @@ function _getFrontend(frontendConfig, reduxApiImpl, webpackIsomorphicTools) {
     var history = createHistory(req.originalUrl);
     var reducer = null;
     if (frontendConfig.reduxReducerPath) {
-      reducer = require(path.resolve(frontendConfig.reduxReducerPath, frontendConfig.reduxReducerFileName));
+      reducer = require(path.resolve(frontendConfig.buildReduxReducerPath, frontendConfig.reduxReducerFileName));
     }
 
     var store = createStore(frontendConfig, reducer(reduxApiImpl.reducers), history);
@@ -127,27 +127,27 @@ var FrontendService = function () {
 
       if (this.config.routedComponentsPath) {
         if (this.config.AppComponentName) {
-          this.config.AppComponent = require(path.resolve(this.config.routedComponentsPath, this.config.AppComponentName, this.config.AppComponentName));
+          this.config.AppComponent = require(path.resolve(this.config.buildRoutedComponentsPath, this.config.AppComponentName, this.config.AppComponentName));
         }
         if (this.config.NotFoundComponentName) {
-          this.config.NotFoundComponent = require(path.resolve(this.config.routedComponentsPath, this.config.NotFoundComponentName, this.config.NotFoundComponentName));
+          this.config.NotFoundComponent = require(path.resolve(this.config.buildRoutedComponentsPath, this.config.NotFoundComponentName, this.config.NotFoundComponentName));
         }
       }
 
       Object.keys(this.routeConfig).forEach(function (route) {
         if (_this.routeConfig[route].componentName) {
-          _this.routeConfig[route].component = require(path.resolve(_this.config.routedComponentsPath, _this.routeConfig[route].componentName, _this.routeConfig[route].componentName));
+          _this.routeConfig[route].component = require(path.resolve(_this.config.buildRoutedComponentsPath, _this.routeConfig[route].componentName, _this.routeConfig[route].componentName));
         }
       });
 
       if (this.config.relayQueriesHelperPath) {
-        this.config.relayQueries = require(path.resolve(this.config.relayQueriesHelperPath));
-        this.config.relayPrepareParams = require(path.resolve(this.config.relayPrepareParamsPath));
+        this.config.relayQueries = require(path.resolve(this.config.buildRelayQueriesHelperPath));
+        this.config.relayPrepareParams = require(path.resolve(this.config.buildRelayPrepareParamsPath));
         this.config.appQueries = this.config.relayQueries && this.config.relayQueries[this.config.AppComponentQueriesName] ? this.config.relayQueries[this.config.AppComponentQueriesName] : null;
         this.config.appPrepareParams = this.config.AppPreparedParamsFuncName && this.config.relayPrepareParams && this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] ? this.config.relayPrepareParams[this.config.AppPreparedParamsFuncName] : null;
       }
 
-      this.reduxApiConfig = require(path.resolve(this.config.restReducerPath, this.config.restReducerFileName));
+      this.reduxApiConfig = require(path.resolve(this.config.buildRestReducerPath, this.config.restReducerFileName));
       this.reduxApiImpl = (0, _reduxApi2.default)(this.reduxApiConfig);
       this.reduxApiImpl.use("fetch", (0, _fetch2.default)(fetch)).use("server", true);
 
@@ -205,38 +205,38 @@ var FrontendService = function () {
         });
 
         if (_this.config.webpack && process.env.NO_WEBPACK != "1") {
-          (function () {
-            var compiler = Webpack(_this.config.webpackConfig);
+          var compiler = Webpack(_this.config.webpackConfig);
 
-            var port = parseInt(_this.config.webpackPort);
-            var serverOptions = {
-              contentBase: _this.config.webpackContentBaseProtocol + _this.config.webpackContentBaseHost + ':' + _this.config.webpackContentBasePort,
-              quiet: true,
-              noInfo: true,
-              hot: true,
-              inline: true,
-              lazy: false,
-              publicPath: _this.config.webpackConfig.output.publicPath,
-              headers: { "Access-Control-Allow-Origin": '*' },
-              stats: { colors: true },
-              watchOptions: {
-                poll: 2000
-              }
-            };
+          var port = parseInt(_this.config.webpackPort);
+          var serverOptions = {
+            contentBase: _this.config.webpackContentBaseProtocol + _this.config.webpackContentBaseHost + ':' + _this.config.webpackContentBasePort,
+            quiet: true,
+            noInfo: true,
+            hot: true,
+            inline: true,
+            lazy: false,
+            publicPath: _this.config.webpackConfig.output.publicPath,
+            headers: { "Access-Control-Allow-Origin": '*' },
+            stats: "minimal",
+            watchOptions: {
+              ignored: /node_modules/,
+              aggregateTimeout: 500,
+              poll: 2000
+            }
+          };
 
-            var app = new express();
+          var app = new express();
 
-            app.use(require('webpack-dev-middleware')(compiler, serverOptions));
-            app.use(require('webpack-hot-middleware')(compiler));
+          app.use(require('webpack-dev-middleware')(compiler, serverOptions));
+          app.use(require('webpack-hot-middleware')(compiler));
 
-            app.listen(port, function onAppListening(err) {
-              if (err) {
-                console.error(err);
-              } else {
-                console.info('==> 🚧  Webpack development server listening on port %s', port);
-              }
-            });
-          })();
+          app.listen(port, function onAppListening(err) {
+            if (err) {
+              console.error(err);
+            } else {
+              console.info('==> 🚧  Webpack development server listening on port %s', port);
+            }
+          });
         }
       });
 

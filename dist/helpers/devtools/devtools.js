@@ -17,8 +17,8 @@ var _reduxDevtoolsDockMonitor2 = _interopRequireDefault(_reduxDevtoolsDockMonito
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 exports = module.exports = (0, _reduxDevtools.createDevTools)(_react2.default.createElement(
-    _reduxDevtoolsDockMonitor2.default,
-    { toggleVisibilityKey: 'ctrl-H', changePositionKey: 'ctrl-P', defaultIsVisible: false },
-    _react2.default.createElement(_reduxDevtoolsLogMonitor2.default, null)
+  _reduxDevtoolsDockMonitor2.default,
+  { toggleVisibilityKey: 'ctrl-H', changePositionKey: 'ctrl-P', defaultIsVisible: false },
+  _react2.default.createElement(_reduxDevtoolsLogMonitor2.default, null)
 ));
 //# sourceMappingURL=devtools.js.map

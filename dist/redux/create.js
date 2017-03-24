@@ -17,22 +17,22 @@ var _require = require('redux-devtools'),
 var DevTools = require('../helpers/devtools/devtools');
 
 function createStore(config, reducer, history, data) {
-    var finalCreateStore = void 0;
-    if (__DEVELOPMENT__ && __CLIENT__ && __DEVTOOLS__) {
-        finalCreateStore = (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), window.devToolsExtension ? window.devToolsExtension() : DevTools.instrument(), persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)))(_redux.createStore);
-    } else {
-        finalCreateStore = (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default))(_redux.createStore);
-    }
+  var finalCreateStore = void 0;
+  if (__DEVELOPMENT__ && __CLIENT__ && __DEVTOOLS__) {
+    finalCreateStore = (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default), window.devToolsExtension ? window.devToolsExtension() : DevTools.instrument(), persistState(window.location.href.match(/[?&]debug_session=([^&]+)\b/)))(_redux.createStore);
+  } else {
+    finalCreateStore = (0, _redux.compose)((0, _redux.applyMiddleware)(_reduxThunk2.default))(_redux.createStore);
+  }
 
-    var store = finalCreateStore(reducer, data);
+  var store = finalCreateStore(reducer, data);
 
-    if (__DEVELOPMENT__ && module.hot && config) {
-        module.hot.accept(appRoot + '/' + config.reducerPath + '/' + config.reducerFileName, function () {
-            store.replaceReducer(reducer);
-        });
-    }
+  if (__DEVELOPMENT__ && module.hot && config) {
+    module.hot.accept(appRoot + '/' + config.reducerPath + '/' + config.reducerFileName, function () {
+      store.replaceReducer(reducer);
+    });
+  }
 
-    return store;
+  return store;
 }
 
 exports = module.exports = createStore;

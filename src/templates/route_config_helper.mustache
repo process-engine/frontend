@@ -4,10 +4,10 @@ import {
 {{#routes}}  {{routeComponentName}},
 {{/routes}}
   {{appComponentName}}
-} from '{{{containerPath}}}';
+} from '../../containers';
 
-const relayQueries = require('{{{relayQueriesPath}}}');
-const relayPrepareParams = require('{{{relayPrepareParamsPath}}}');
+const relayQueries = require('../../relay');
+const relayPrepareParams = require('../../relay/prepareParams');
 
 const routeSetup = {
   routeConfig: {

@@ -6,6 +6,8 @@
     "transform-regenerator",
     "transform-decorators-legacy",
     "transform-react-display-name",
+    "material-ui",
+    "lodash",
     [
       "transform-runtime",
       {

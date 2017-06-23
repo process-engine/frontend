@@ -52,6 +52,8 @@ var Webpack = require('webpack');
 var mustache = require('mustache');
 var nconf = require('nconf');
 
+var merge = require('lodash.merge');
+
 function _getFrontend(frontendConfig, reduxApiImpl, webpackIsomorphicTools) {
   return function provideFrontend(req, res, next) {
     if (__DEVELOPMENT__) {
@@ -135,8 +137,10 @@ var FrontendService = function () {
       }
 
       Object.keys(this.routeConfig).forEach(function (route) {
-        if (_this.routeConfig[route].componentName) {
+        if (_this.routeConfig[route].componentName && !_this.routeConfig[route].componentPath) {
           _this.routeConfig[route].component = require(path.resolve(_this.config.buildRoutedComponentsPath, _this.routeConfig[route].componentName, _this.routeConfig[route].componentName));
+        } else if (_this.routeConfig[route].componentPath) {
+          _this.routeConfig[route].component = require(_this.routeConfig[route].componentPath);
         }
       });
 
@@ -175,6 +179,8 @@ var FrontendService = function () {
               routePath: _this.config.routeConfig[key].path,
               isIndexRoute: _this.config.routeConfig[key].isIndexRoute,
               routePrepareParamFuncName: _this.config.routeConfig[key].prepareParamFuncName,
+              hasRouteComponentName: !(_this.config.routeConfig[key].componentPath != null),
+              routeComponentPath: _this.config.routeConfig[key].componentPath,
               routeComponentName: _this.config.routeConfig[key].componentName,
               routeComponentQueriesName: _this.config.routeConfig[key].componentQueriesName,
               isLast: idx >= Object.keys(_this.config.routeConfig).length - 1
@@ -251,6 +257,11 @@ var FrontendService = function () {
           resolve(true);
         });
       });
+    }
+  }, {
+    key: 'transformRoute',
+    value: function transformRoute(routeConfig) {
+      merge(this.config.routeConfig, routeConfig);
     }
   }, {
     key: 'getFrontend',

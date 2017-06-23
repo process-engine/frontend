@@ -59,6 +59,8 @@ var Html = (_temp = _class = function (_Component) {
   (0, _createClass3.default)(Html, [{
     key: 'render',
     value: function render() {
+      var _this2 = this;
+
       var _props = this.props,
           assets = _props.assets,
           component = _props.component,
@@ -71,6 +73,13 @@ var Html = (_temp = _class = function (_Component) {
       if (this.props.config.messageBus) {
         messageBusProvider = _react2.default.createElement('script', { src: "/" + (this.props.config.messageBusEndPointName || 'faye') + "/client.js", charSet: 'UTF-8' });
       }
+
+      var staticScriptTags = [];
+      if (this.props.config.staticDlls) {
+        this.props.config.staticDlls.split(',').forEach(function (elem) {
+          staticScriptTags.push(_react2.default.createElement('script', { src: "/" + (_this2.props.config.staticDllURLPath + "/" + elem.trim() + ".dll.js"), charSet: 'UTF-8' }));
+        });
+      }
       return _react2.default.createElement(
         'html',
         { lang: 'en-us' },
@@ -82,7 +91,8 @@ var Html = (_temp = _class = function (_Component) {
           head.meta.toComponent(),
           head.link.toComponent(),
           head.script.toComponent(),
-          _react2.default.createElement('link', { rel: 'stylesheet', href: '/vendor/bpmn-font/css/bpmn-embedded.css' }),
+          staticScriptTags,
+          _react2.default.createElement('link', { rel: 'stylesheet', href: '/processManager/vendor/bpmn-font/css/bpmn-embedded.css' }),
           _react2.default.createElement('link', { rel: 'shortcut icon', href: '/favicon.ico' }),
           _react2.default.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
           Object.keys(assets.styles).map(function (style, key) {

@@ -1,10 +1,14 @@
 'use strict';
 
 import {
-{{#routes}}  {{routeComponentName}},
+{{#routes}}  {{#hasRouteComponentName}}{{routeComponentName}},{{/hasRouteComponentName}}
 {{/routes}}
   {{appComponentName}}
 } from '../../containers';
+
+{{#routes}}{{^hasRouteComponentName}}
+import {{routeComponentName}} from '{{{routeComponentPath}}}';{{/hasRouteComponentName}}
+{{/routes}}
 
 const relayQueries = require('../../relay');
 const relayPrepareParams = require('../../relay/prepareParams');

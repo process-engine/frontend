@@ -35,6 +35,13 @@ class Html extends Component {
       messageBusProvider = (
         <script src={"/" + (this.props.config.messageBusEndPointName || 'faye') + "/client.js"} charSet="UTF-8"/>);
     }
+
+    let staticScriptTags = [];
+    if (this.props.config.staticDlls) {
+      this.props.config.staticDlls.split(',').forEach((elem) => {
+        staticScriptTags.push(<script src={"/" + (this.props.config.staticDllURLPath + "/" + elem.trim() + ".dll.js")} charSet="UTF-8"/>);
+      });
+    }
     return (
       <html lang="en-us">
       <head>
@@ -44,7 +51,10 @@ class Html extends Component {
         {head.link.toComponent()}
         {head.script.toComponent()}
 
-        <link rel="stylesheet" href="/vendor/bpmn-font/css/bpmn-embedded.css"/>
+        {staticScriptTags}
+
+        <link rel="stylesheet" href="/processManager/vendor/bpmn-font/css/bpmn-embedded.css"/>
+
         <link rel="shortcut icon" href="/favicon.ico"/>
 
         <meta name="viewport" content="width=device-width, initial-scale=1"/>

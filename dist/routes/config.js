@@ -1,5 +1,9 @@
 'use strict';
 
+var _extends2 = require('babel-runtime/helpers/extends');
+
+var _extends3 = _interopRequireDefault(_extends2);
+
 var _objectWithoutProperties2 = require('babel-runtime/helpers/objectWithoutProperties');
 
 var _objectWithoutProperties3 = _interopRequireDefault(_objectWithoutProperties2);
@@ -15,7 +19,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 module.exports.routeConfig = function () {
   var routes = {};
 
-  var buildRouting = function buildRouting(store, frontendConfig) {
+  var buildRouting = function buildRouting(store, frontendConfig, injectables) {
     // Wrap routes into a root route
     // Add the 404 route by default
     frontendConfig.routeConfig.__404__ = {
@@ -63,7 +67,7 @@ module.exports.routeConfig = function () {
 
       return _react2.default.createElement(
         RouteElement,
-        rest,
+        (0, _extends3.default)({}, rest, { injectables: injectables }),
         childRouteBlocks
       );
     };
@@ -74,8 +78,8 @@ module.exports.routeConfig = function () {
     };
   };
 
-  return function (store, frontendConfig) {
-    return buildRouting(store, frontendConfig);
+  return function (store, frontendConfig, injectables) {
+    return buildRouting(store, frontendConfig, injectables);
   };
 }();
 //# sourceMappingURL=config.js.map

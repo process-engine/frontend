@@ -6,7 +6,7 @@ import { IndexRoute, Route } from 'react-router';
 module.exports.routeConfig = (function() {
   let routes = {};
 
-  const buildRouting = (store, frontendConfig) => {
+  const buildRouting = (store, frontendConfig, injectables) => {
     // Wrap routes into a root route
     // Add the 404 route by default
     frontendConfig.routeConfig.__404__ = {
@@ -50,7 +50,7 @@ module.exports.routeConfig = (function() {
       }
 
       return (
-        <RouteElement {...rest}>
+        <RouteElement {...rest} injectables={injectables}>
           {childRouteBlocks}
         </RouteElement>
       );
@@ -62,5 +62,5 @@ module.exports.routeConfig = (function() {
     };
   };
 
-  return (store, frontendConfig) => buildRouting(store, frontendConfig);
+  return (store, frontendConfig, injectables) => buildRouting(store, frontendConfig, injectables);
 }());

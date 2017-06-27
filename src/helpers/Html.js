@@ -53,6 +53,7 @@ class Html extends Component {
 
         {staticScriptTags}
 
+        <link rel="stylesheet" href="/vendor/bpmn-font/css/bpmn-embedded.css"/>
         <link rel="stylesheet" href="/processManager/vendor/bpmn-font/css/bpmn-embedded.css"/>
 
         <link rel="shortcut icon" href="/favicon.ico"/>

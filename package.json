@@ -41,7 +41,6 @@
     "load-grunt-tasks": "^3.5.2",
     "lodash": "^4.16.4",
     "lodash.merge": "^4.6.0",
-    "material-ui": "^0.17.4",
     "multireducer": "^3.0.1",
     "mustache": "^2.2.1",
     "nconf": "^0.8.4",

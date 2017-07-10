@@ -42,6 +42,13 @@ class Html extends Component {
         staticScriptTags.push(<script src={"/" + (this.props.config.staticDllURLPath + "/" + elem.trim() + ".dll.js")} charSet="UTF-8"/>);
       });
     }
+    let staticLinkTags = [];
+    if (this.props.config.staticLinks) {
+      this.props.config.staticLinks.forEach((elem) => {
+        staticLinkTags.push(<link rel={elem.type} href={elem.href} charSet="UTF-8"/>);
+      });
+    }
+
     return (
       <html lang="en-us">
       <head>
@@ -53,8 +60,7 @@ class Html extends Component {
 
         {staticScriptTags}
 
-        <link rel="stylesheet" href="/vendor/bpmn-font/css/bpmn-embedded.css"/>
-        <link rel="stylesheet" href="/processManager/vendor/bpmn-font/css/bpmn-embedded.css"/>
+        {staticLinkTags}
 
         <link rel="shortcut icon" href="/favicon.ico"/>
 

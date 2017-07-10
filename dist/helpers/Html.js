@@ -80,6 +80,13 @@ var Html = (_temp = _class = function (_Component) {
           staticScriptTags.push(_react2.default.createElement('script', { src: "/" + (_this2.props.config.staticDllURLPath + "/" + elem.trim() + ".dll.js"), charSet: 'UTF-8' }));
         });
       }
+      var staticLinkTags = [];
+      if (this.props.config.staticLinks) {
+        this.props.config.staticLinks.forEach(function (elem) {
+          staticLinkTags.push(_react2.default.createElement('link', { rel: elem.type, href: elem.href, charSet: 'UTF-8' }));
+        });
+      }
+
       return _react2.default.createElement(
         'html',
         { lang: 'en-us' },
@@ -92,8 +99,7 @@ var Html = (_temp = _class = function (_Component) {
           head.link.toComponent(),
           head.script.toComponent(),
           staticScriptTags,
-          _react2.default.createElement('link', { rel: 'stylesheet', href: '/vendor/bpmn-font/css/bpmn-embedded.css' }),
-          _react2.default.createElement('link', { rel: 'stylesheet', href: '/processManager/vendor/bpmn-font/css/bpmn-embedded.css' }),
+          staticLinkTags,
           _react2.default.createElement('link', { rel: 'shortcut icon', href: '/favicon.ico' }),
           _react2.default.createElement('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1' }),
           Object.keys(assets.styles).map(function (style, key) {

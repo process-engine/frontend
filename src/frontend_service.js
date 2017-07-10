@@ -245,6 +245,14 @@ class FrontendService {
     merge(this.config.routeConfig, routeConfig);
   }
 
+  injectStaticLink(linkTag) {
+    if (!this.config.staticLinks) {
+      this.config.staticLinks = new Array();
+    }
+
+    this.config.staticLinks.push(linkTag);
+  }
+
   getFrontend() {
     return getFrontend.bind(this)(this.config, this.reduxApiImpl, this.webpackIsomorphicTools);
   }

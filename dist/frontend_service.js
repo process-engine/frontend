@@ -264,6 +264,15 @@ var FrontendService = function () {
       merge(this.config.routeConfig, routeConfig);
     }
   }, {
+    key: 'injectStaticLink',
+    value: function injectStaticLink(linkTag) {
+      if (!this.config.staticLinks) {
+        this.config.staticLinks = new Array();
+      }
+
+      this.config.staticLinks.push(linkTag);
+    }
+  }, {
     key: 'getFrontend',
     value: function getFrontend() {
       return _getFrontend.bind(this)(this.config, this.reduxApiImpl, this.webpackIsomorphicTools);

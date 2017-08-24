@@ -1,39 +1,30 @@
-import {IFrontendProvider, IFrontendService, IServerSideRenderService} from "@process-engine-js/frontend_contracts";
+import {IFrontendService, IServerSideRenderService} from "@process-engine-js/frontend_contracts";
 import * as path from 'path';
 
 export class FrontendService implements IFrontendService {
 
   private _serverSideRenderService: IServerSideRenderService = undefined;
-  private _frontendProvider: IFrontendProvider = undefined;
 
   public config: any = undefined;
 
-  constructor(serverSideRenderService: IServerSideRenderService, frontendProvider: IFrontendProvider) {
+  constructor(serverSideRenderService: IServerSideRenderService) {
     this._serverSideRenderService = serverSideRenderService;
-    this._frontendProvider = frontendProvider;
   }
 
   private get serverSideRenderService(): IServerSideRenderService {
     return this._serverSideRenderService;
   }
 
-  private get frontendProvider(): IFrontendProvider {
-    return this._frontendProvider;
-  }
-
   public async initialize(): Promise<void> {
     if (this.serverSideRenderService) {
-      this.serverSideRenderService.initialize();
-    }
-    if (this.frontendProvider) {
-      this.frontendProvider.initialize();
+      this.serverSideRenderService.initialize(this.config);
     }
   }
 
   getFrontend() {
     return (req: any, res: any, next) => {
       if (this.serverSideRenderService) {
-        res.status(200).send(this.serverSideRenderService.render(this.frontendProvider));
+        this.serverSideRenderService.render(req, res, next);
       } else if (this.config.frontendIndexFilePath) {
         res.status(200).sendFile(path.resolve(this.config.frontendIndexFilePath, (this.config.frontendIndexFileName ? this.config.frontendIndexFileName : 'index.html')));
       } else {

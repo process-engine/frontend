@@ -155,97 +155,6 @@ var FrontendService = function () {
       this.reduxApiImpl = (0, _reduxApi2.default)(this.reduxApiConfig);
       this.reduxApiImpl.use("fetch", (0, _fetch2.default)(fetch)).use("server", true);
 
-      var helperTemplatePath = __dirname + '/templates/route_config_helper.mustache';
-
-      fs.readFile(helperTemplatePath, function (readRouteConfigHelperTemplateErr, routeConfigHelperTemplateData) {
-        if (readRouteConfigHelperTemplateErr) throw readRouteConfigHelperTemplateErr;
-
-        var routeConfigObject = {
-          containerPath: path.resolve(_this.config.routedComponentsPath),
-          relayQueriesPath: path.resolve(_this.config.relayQueriesHelperPath),
-          relayPrepareParamsPath: path.resolve(_this.config.relayPrepareParamsPath),
-          mainRoutePath: _this.config.routePath,
-          appComponentName: _this.config.AppComponentName,
-          appComponentQueriesName: _this.config.AppComponentQueriesName,
-          appName: _this.config.appName,
-          name: _this.config.name,
-          routes: Object.keys(_this.config.routeConfig).map(function (key, idx) {
-            return {
-              routeKeyName: key,
-              routeIndex: idx,
-              routeName: _this.config.routeConfig[key].name,
-              breadcrumbName: _this.config.routeConfig[key].breadcrumbName,
-              breadcrumbIgnore: _this.config.routeConfig[key].breadcrumbIgnore || false,
-              routePath: _this.config.routeConfig[key].path,
-              isIndexRoute: _this.config.routeConfig[key].isIndexRoute,
-              routePrepareParamFuncName: _this.config.routeConfig[key].prepareParamFuncName,
-              hasRouteComponentName: !(_this.config.routeConfig[key].componentPath != null),
-              routeComponentPath: _this.config.routeConfig[key].componentPath,
-              routeComponentName: _this.config.routeConfig[key].componentName,
-              routeComponentQueriesName: _this.config.routeConfig[key].componentQueriesName,
-              isLast: idx >= Object.keys(_this.config.routeConfig).length - 1
-            };
-          })
-        };
-
-        //Routes are generated into the src and will be build into dist
-        // frontend
-        fs.mkdir(path.resolve(_this.config.frontendSrcPath), function (mkDirFrontendErr) {
-          if (mkDirFrontendErr && mkDirFrontendErr.code != 'EEXIST') throw mkDirFrontendErr;
-
-          // helpers
-          fs.mkdir(path.resolve(_this.config.frontendSrcPath, _this.config.helpersTargetPathName), function (mkDirHelperErr) {
-            if (mkDirHelperErr && mkDirHelperErr.code != 'EEXIST') throw mkDirHelperErr;
-
-            // routes
-            fs.mkdir(path.resolve(_this.config.frontendSrcPath, _this.config.helpersTargetPathName, _this.config.routeHelperPathName), function (mkDirRoutesErr) {
-              if (mkDirRoutesErr && mkDirRoutesErr.code != 'EEXIST') throw mkDirRoutesErr;
-
-              fs.writeFile(path.resolve(_this.config.frontendSrcPath, _this.config.helpersTargetPathName, _this.config.routeHelperPathName, _this.config.routeHelperFileName + '.js'), mustache.render(routeConfigHelperTemplateData.toString(), routeConfigObject), function (err) {
-                if (err) throw err;
-
-                console.log('RouteConfigHelper JS generated!');
-              });
-            });
-          });
-        });
-
-        if (_this.config.webpack && process.env.NO_WEBPACK != "1") {
-          var compiler = Webpack(_this.config.webpackConfig);
-
-          var port = parseInt(_this.config.webpackPort);
-          var serverOptions = {
-            contentBase: _this.config.webpackContentBaseProtocol + _this.config.webpackContentBaseHost + ':' + _this.config.webpackContentBasePort,
-            quiet: true,
-            noInfo: true,
-            hot: true,
-            inline: true,
-            lazy: false,
-            publicPath: _this.config.webpackConfig.output.publicPath,
-            headers: { "Access-Control-Allow-Origin": '*' },
-            stats: "minimal",
-            watchOptions: {
-              ignored: /node_modules/,
-              aggregateTimeout: 500,
-              poll: 2000
-            }
-          };
-
-          var app = new express();
-
-          app.use(require('webpack-dev-middleware')(compiler, serverOptions));
-          app.use(require('webpack-hot-middleware')(compiler));
-
-          app.listen(port, function onAppListening(err) {
-            if (err) {
-              console.error(err);
-            } else {
-              console.info('==> 🚧  Webpack development server listening on port %s', port);
-            }
-          });
-        }
-      });
-
       var isoToolsConfig = WebpackIsomorphicToolsConf(this.config.appConfig);
 
       if (this.config.webpack && this.config.webpackConfigPath) {
@@ -254,6 +163,41 @@ var FrontendService = function () {
 
       return new Promise(function (resolve) {
         _this.webpackIsomorphicTools = new WebpackIsomorphicTools(isoToolsConfig).server(path.normalize(process.cwd()), function () {
+          if (_this.config.webpack && process.env.NO_WEBPACK != "1") {
+            var compiler = Webpack(_this.config.webpackConfig);
+
+            var port = parseInt(_this.config.webpackPort);
+            var serverOptions = {
+              contentBase: _this.config.webpackContentBaseProtocol + _this.config.webpackContentBaseHost + ':' + _this.config.webpackContentBasePort,
+              quiet: true,
+              noInfo: true,
+              hot: true,
+              inline: true,
+              lazy: false,
+              publicPath: _this.config.webpackConfig.output.publicPath,
+              headers: { "Access-Control-Allow-Origin": '*' },
+              stats: "minimal",
+              watchOptions: {
+                ignored: /node_modules/,
+                aggregateTimeout: 500,
+                poll: 2000
+              }
+            };
+
+            var app = new express();
+
+            app.use(require('webpack-dev-middleware')(compiler, serverOptions));
+            app.use(require('webpack-hot-middleware')(compiler));
+
+            app.listen(port, function onAppListening(err) {
+              if (err) {
+                console.error(err);
+              } else {
+                console.info('==> 🚧  Webpack development server listening on port %s', port);
+              }
+            });
+          }
+
           resolve(true);
         });
       });
@@ -262,6 +206,67 @@ var FrontendService = function () {
     key: 'transformRoute',
     value: function transformRoute(routeConfig) {
       merge(this.config.routeConfig, routeConfig);
+    }
+  }, {
+    key: 'start',
+    value: function start() {
+      var _this2 = this;
+
+      var helperTemplatePath = __dirname + '/templates/route_config_helper.mustache';
+
+      fs.readFile(helperTemplatePath, function (readRouteConfigHelperTemplateErr, routeConfigHelperTemplateData) {
+        if (readRouteConfigHelperTemplateErr) throw readRouteConfigHelperTemplateErr;
+
+        var routeConfigObject = {
+          containerPath: path.resolve(_this2.config.routedComponentsPath),
+          relayQueriesPath: path.resolve(_this2.config.relayQueriesHelperPath),
+          relayPrepareParamsPath: path.resolve(_this2.config.relayPrepareParamsPath),
+          mainRoutePath: _this2.config.routePath,
+          appComponentName: _this2.config.AppComponentName,
+          appComponentQueriesName: _this2.config.AppComponentQueriesName,
+          appName: _this2.config.appName,
+          name: _this2.config.name,
+          routes: Object.keys(_this2.config.routeConfig).map(function (key, idx) {
+            return {
+              routeKeyName: key,
+              routeIndex: idx,
+              routeName: _this2.config.routeConfig[key].name,
+              breadcrumbName: _this2.config.routeConfig[key].breadcrumbName,
+              breadcrumbIgnore: _this2.config.routeConfig[key].breadcrumbIgnore || false,
+              routePath: _this2.config.routeConfig[key].path,
+              isIndexRoute: _this2.config.routeConfig[key].isIndexRoute,
+              routePrepareParamFuncName: _this2.config.routeConfig[key].prepareParamFuncName,
+              hasRouteComponentName: !(_this2.config.routeConfig[key].componentPath != null),
+              routeComponentPath: _this2.config.routeConfig[key].componentPath,
+              routeComponentName: _this2.config.routeConfig[key].componentName,
+              routeComponentQueriesName: _this2.config.routeConfig[key].componentQueriesName,
+              isLast: idx >= Object.keys(_this2.config.routeConfig).length - 1
+            };
+          })
+        };
+
+        //Routes are generated into the src and will be build into dist
+        // frontend
+        fs.mkdir(path.resolve(_this2.config.frontendSrcPath), function (mkDirFrontendErr) {
+          if (mkDirFrontendErr && mkDirFrontendErr.code != 'EEXIST') throw mkDirFrontendErr;
+
+          // helpers
+          fs.mkdir(path.resolve(_this2.config.frontendSrcPath, _this2.config.helpersTargetPathName), function (mkDirHelperErr) {
+            if (mkDirHelperErr && mkDirHelperErr.code != 'EEXIST') throw mkDirHelperErr;
+
+            // routes
+            fs.mkdir(path.resolve(_this2.config.frontendSrcPath, _this2.config.helpersTargetPathName, _this2.config.routeHelperPathName), function (mkDirRoutesErr) {
+              if (mkDirRoutesErr && mkDirRoutesErr.code != 'EEXIST') throw mkDirRoutesErr;
+
+              fs.writeFile(path.resolve(_this2.config.frontendSrcPath, _this2.config.helpersTargetPathName, _this2.config.routeHelperPathName, _this2.config.routeHelperFileName + '.js'), mustache.render(routeConfigHelperTemplateData.toString(), routeConfigObject), function (err) {
+                if (err) throw err;
+
+                console.log('RouteConfigHelper JS generated!');
+              });
+            });
+          });
+        });
+      });
     }
   }, {
     key: 'injectStaticLink',

@@ -137,6 +137,59 @@ class FrontendService {
       .use("fetch", adapterFetch(fetch))
       .use("server", true);
 
+    const isoToolsConfig = WebpackIsomorphicToolsConf(this.config.appConfig);
+
+    if (this.config.webpack && this.config.webpackConfigPath) {
+      this.config.webpackConfig = require(path.resolve(this.config.webpackConfigPath, this.config.webpackEnvironment, this.config.webpackConfigFileName))(this.config, isoToolsConfig);
+    }
+
+    return new Promise((resolve) => {
+      this.webpackIsomorphicTools = new WebpackIsomorphicTools(isoToolsConfig).server(path.normalize(process.cwd()), () => {
+        if (this.config.webpack && process.env.NO_WEBPACK != "1") {
+          const compiler = Webpack(this.config.webpackConfig);
+
+          const port = parseInt(this.config.webpackPort);
+          const serverOptions = {
+            contentBase: this.config.webpackContentBaseProtocol + this.config.webpackContentBaseHost + ':' + this.config.webpackContentBasePort,
+            quiet: true,
+            noInfo: true,
+            hot: true,
+            inline: true,
+            lazy: false,
+            publicPath: this.config.webpackConfig.output.publicPath,
+            headers: { "Access-Control-Allow-Origin": '*' },
+            stats: "minimal",
+            watchOptions: {
+              ignored: /node_modules/,
+              aggregateTimeout: 500,
+              poll: 2000,
+            },
+          };
+
+          const app = new express();
+
+          app.use(require('webpack-dev-middleware')(compiler, serverOptions));
+          app.use(require('webpack-hot-middleware')(compiler));
+
+          app.listen(port, function onAppListening(err) {
+            if (err) {
+              console.error(err);
+            } else {
+              console.info('==> 🚧  Webpack development server listening on port %s', port);
+            }
+          });
+        }
+        
+        resolve(true);
+      });
+    });
+  }
+
+  transformRoute(routeConfig) {
+    merge(this.config.routeConfig, routeConfig);
+  }
+
+  start() {
     const helperTemplatePath = __dirname + '/templates/route_config_helper.mustache';
 
     fs.readFile(helperTemplatePath, (readRouteConfigHelperTemplateErr, routeConfigHelperTemplateData) => {
@@ -191,58 +244,7 @@ class FrontendService {
           });
         });
       });
-
-      if (this.config.webpack && process.env.NO_WEBPACK != "1") {
-        const compiler = Webpack(this.config.webpackConfig);
-
-        const port = parseInt(this.config.webpackPort);
-        const serverOptions = {
-          contentBase: this.config.webpackContentBaseProtocol + this.config.webpackContentBaseHost + ':' + this.config.webpackContentBasePort,
-          quiet: true,
-          noInfo: true,
-          hot: true,
-          inline: true,
-          lazy: false,
-          publicPath: this.config.webpackConfig.output.publicPath,
-          headers: { "Access-Control-Allow-Origin": '*' },
-          stats: "minimal",
-          watchOptions: {
-            ignored: /node_modules/,
-            aggregateTimeout: 500,
-            poll: 2000,
-          },
-        };
-
-        const app = new express();
-
-        app.use(require('webpack-dev-middleware')(compiler, serverOptions));
-        app.use(require('webpack-hot-middleware')(compiler));
-
-        app.listen(port, function onAppListening(err) {
-          if (err) {
-            console.error(err);
-          } else {
-            console.info('==> 🚧  Webpack development server listening on port %s', port);
-          }
-        });
-      }
     });
-
-    const isoToolsConfig = WebpackIsomorphicToolsConf(this.config.appConfig);
-
-    if (this.config.webpack && this.config.webpackConfigPath) {
-      this.config.webpackConfig = require(path.resolve(this.config.webpackConfigPath, this.config.webpackEnvironment, this.config.webpackConfigFileName))(this.config, isoToolsConfig);
-    }
-
-    return new Promise((resolve) => {
-      this.webpackIsomorphicTools = new WebpackIsomorphicTools(isoToolsConfig).server(path.normalize(process.cwd()), () => {
-        resolve(true);
-      });
-    });
-  }
-
-  transformRoute(routeConfig) {
-    merge(this.config.routeConfig, routeConfig);
   }
 
   injectStaticLink(linkTag) {

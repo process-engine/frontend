@@ -2,18 +2,27 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const path = require("path");
 class FrontendService {
-    constructor(serverSideRenderService) {
+    constructor(serverSideRenderServiceFactory) {
         this._serverSideRenderService = undefined;
+        this._serverSideRenderServiceFactory = undefined;
         this.config = undefined;
-        this._serverSideRenderService = serverSideRenderService;
+        this._serverSideRenderServiceFactory = serverSideRenderServiceFactory;
+    }
+    get serverSideRenderServiceFactory() {
+        return this._serverSideRenderServiceFactory;
     }
     get serverSideRenderService() {
         return this._serverSideRenderService;
     }
     async initialize() {
-        if (this.serverSideRenderService) {
-            this.serverSideRenderService.initialize(this.config);
+        if (this.serverSideRenderServiceFactory) {
+            this._serverSideRenderService = await this.serverSideRenderServiceFactory([], this._getSsrConfig());
         }
+    }
+    _getSsrConfig() {
+        return {
+            frontend: this.config,
+        };
     }
     getFrontend() {
         return (req, res, next) => {
@@ -21,7 +30,13 @@ class FrontendService {
                 this.serverSideRenderService.render(req, res, next);
             }
             else if (this.config.frontendIndexFilePath) {
-                res.status(200).sendFile(path.resolve(this.config.frontendIndexFilePath, (this.config.frontendIndexFileName ? this.config.frontendIndexFileName : 'index.html')));
+                let indexFileName = 'index.html';
+                if (this.config.frontendIndexFileName !== undefined &&
+                    this.config.frontendIndexFileName !== null) {
+                    indexFileName = this.config.frontendIndexFileName;
+                }
+                const indexFilePath = path.resolve(this.config.frontendIndexFilePath, indexFileName);
+                res.status(200).sendFile(indexFilePath);
             }
             else {
                 res.status(404).send('No functional frontend configuration found (no Static Frontend nor SSRService configured).');

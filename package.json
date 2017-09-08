@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "@process-engine-js/frontend_contracts": "^1.0.2",
-    "addict-ioc": "^2.2.6"
+    "addict-ioc": "^2.2.8"
   },
   "devDependencies": {
     "@process-engine-js/tslint-config": "^1.0.0",

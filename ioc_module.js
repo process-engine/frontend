@@ -1,10 +1,12 @@
 'use strict';
 
-const FrontendService = require('./dist/index').FrontendService;
+const FrontendService = require('./dist/commonjs/index').FrontendService;
 
 function registerInContainer(container) {
 
   container.register('FrontendService', FrontendService)
+    .dependencies('ServerSideRenderService')
+    .injectPromiseLazy('ServerSideRenderService')
     .configure('frontend:service')
     .singleton();
 }

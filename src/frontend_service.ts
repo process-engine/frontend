@@ -33,7 +33,7 @@ export class FrontendService implements IFrontendService {
     };
   }
 
-  getFrontend() {
+  public getFrontend() {
     return (req: any, res: any, next) => {
       if (this.serverSideRenderService) {
         this.serverSideRenderService.render(req, res, next);
@@ -49,6 +49,6 @@ export class FrontendService implements IFrontendService {
       } else {
         res.status(404).send('No functional frontend configuration found (no Static Frontend nor SSRService configured).');
       }
-    }
+    };
   }
 }

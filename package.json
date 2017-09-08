@@ -18,7 +18,7 @@
     "addict-ioc": "^2.2.8"
   },
   "devDependencies": {
-    "@process-engine-js/tslint-config": "^1.0.0",
+    "@process-engine-js/tslint-config": "^1.0.1",
     "@types/node": "^8.0.27",
     "gulp": "^3.9.1",
     "gulptraum": "^2.2.1",

@@ -31,5 +31,9 @@
     "graphql": "^0.8.2",
     "react": "^15.6.1",
     "react-dom": "^15.6.1"
+  },
+  "scripts": {
+    "build": "gulp build",
+    "prepublishOnly": "npm run build"
   }
 }

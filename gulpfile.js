@@ -4,7 +4,8 @@ const gulptraum = require('gulptraum');
 const gulptraumTypescriptPlugin = require('gulptraum-typescript');
 const tsconfig = require('tsconfig');
 
-const buildSystemConfig = {};
+const buildSystemConfig = {
+};
 
 const buildSystem = new gulptraum.BuildSystem(buildSystemConfig);
 

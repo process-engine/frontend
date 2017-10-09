@@ -1,5 +1,5 @@
 {
-  "name": "@process-engine-js/frontend",
+  "name": "@process-engine/frontend",
   "publishConfig": {
     "registry": "https://www.npmjs.com"
   },
@@ -14,11 +14,11 @@
     "Simon Reymann <simon.reymann@quantusflow.com>"
   ],
   "dependencies": {
-    "@process-engine-js/frontend_contracts": "^2.0.0",
+    "@process-engine/frontend_contracts": "^2.0.0",
     "addict-ioc": "^2.2.8"
   },
   "devDependencies": {
-    "@process-engine-js/tslint-config": "^1.0.1",
+    "@essential-projects/tslint-config": "^1.0.1",
     "@types/node": "^8.0.27",
     "gulp": "^3.9.1",
     "gulptraum": "^2.2.1",

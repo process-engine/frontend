@@ -1,4 +1,4 @@
-import {IFrontendService, IServerSideRenderService} from '@process-engine-js/frontend_contracts';
+import {IFrontendService, IServerSideRenderService} from '@process-engine/frontend_contracts';
 import {IFactoryAsync} from 'addict-ioc';
 import * as path from 'path';
 

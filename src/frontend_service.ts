@@ -1,4 +1,4 @@
-import {IFrontendService, IServerSideRenderService} from '@process-engine/frontend_contracts';
+import {IFrontendService, IServerSideRenderService} from '@quantusflow/frontend_contracts';
 import {IFactoryAsync} from 'addict-ioc';
 import * as path from 'path';
 
@@ -33,19 +33,20 @@ export class FrontendService implements IFrontendService {
     };
   }
 
-  public getFrontend() {
-    return (req: any, res: any, next) => {
+  // tslint:disable:no-magic-numbers
+  public getFrontend(): any {
+    return (req: any, res: any, next: any): any => {
       if (this.serverSideRenderService) {
         this.serverSideRenderService.render(req, res, next);
       } else if (this.config.frontendIndexFilePath) {
-        let indexFileName = 'index.html';
+        let indexFileName: string = 'index.html';
         if (this.config.frontendIndexFileName !== undefined &&
           this.config.frontendIndexFileName !== null) {
           indexFileName = this.config.frontendIndexFileName;
         }
 
-        const indexFilePath = path.resolve(this.config.frontendIndexFilePath, indexFileName);
-        res.status(200).sendFile(indexFilePath);
+        const indexFilePath: string = path.resolve(this.config.frontendIndexFilePath, indexFileName);
+        res.status(200).sendFile(indexFilePath); // tslint:disable-line:no-magic-numbers
       } else {
         res.status(404).send('No functional frontend configuration found (no Static Frontend nor SSRService configured).');
       }

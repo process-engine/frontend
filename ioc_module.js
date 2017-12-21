@@ -1,6 +1,6 @@
 'use strict';
 
-const FrontendService = require('./dist/commonjs/index').FrontendService;
+var FrontendService = require('./dist/commonjs/index').FrontendService;
 
 function registerInContainer(container) {
 
